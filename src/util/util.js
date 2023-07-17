@@ -97,9 +97,9 @@ exports.usergetproducts = (callback) => {
   });
 };
 
-exports.usersetcartdata = (user, callback) => {
-  const userid = user.userID;
-  const prodid = user.prodid;
+// exports.usersetcartdata = (user, callback) => {
+//   const userid = user.userID;
+//   const prodid = user.prodid;
 
-  let prodTotalQuantity = 0;
-};
+//   let prodTotalQuantity = 0;
+// };

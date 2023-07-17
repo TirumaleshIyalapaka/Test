@@ -2,8 +2,8 @@ const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 const bodyparser = require("body-parser");
-const e = require("express");
 const controllers = require("./src/contollers/contollers");
+const routes = require("./src/routes/routes");
 
 const app = express();
 
@@ -57,19 +57,7 @@ const db = mysql.createConnection({
 //     );
 //   }
 
-app.post("/signup", controllers.signup);
-
-app.post("/login", controllers.login);
-
-app.post("/addproduct", controllers.addproduct);
-
-app.get("/getproducts", controllers.getproducts);
-
-app.post("/setcartdata", controllers.setcartdata);
-
-app.get("/getcartdata", controllers.getcartdata);
-
-app.get("/buycartitems", controllers.buycartitems);
+app.use("/", routes);
 
 // app.get("/getcartdata", (req, res) => {
 //     const { userID } = req.query;

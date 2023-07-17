@@ -1,15 +1,15 @@
 const util = require("../util/util");
-// const mysql = require("mysql");
+const mysql = require("mysql");
 
-// const cors = require("cors");
-// const bodyparser = require("body-parser");
+const cors = require("cors");
+const bodyparser = require("body-parser");
 
-// const db = mysql.createConnection({
-//   user: "root",
-//   host: "localhost",
-//   password: "password",
-//   database: "shopping_cart",
-// });
+const db = mysql.createConnection({
+  user: "root",
+  host: "localhost",
+  password: "password",
+  database: "shopping_cart",
+});
 
 exports.signup = (req, res) => {
   console.log(req.body);
