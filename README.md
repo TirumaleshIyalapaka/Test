@@ -14,3 +14,32 @@ I have written the routes inside the routes.js file.
 - Signup
 - AddProduct
 - Cart
+___
+1. The header component has the MARVEL Logo along with the cart badge, login and singup buttons.
+2. The sidebar contains routing for the About,shopping and add product pages.
+
+---
+
+## The following is the code for the routes.  
+  
+```JavaScript
+const express = require("express");
+const controllers = require("../contollers/contollers");
+
+module.exports = function (app, router) {
+  app.route("/signup").post(controllers.signup);
+
+  app.route("/login").post(controllers.login);
+
+  app.route("/addproduct").post(controllers.addproduct);
+
+  app.route("/getproducts").get(controllers.getproducts);
+
+  app.route("/getcartdata").get(controllers.getcartdata);
+
+  app.route("/buycartitems").get(controllers.buycartitems);
+};
+
+// module.exports = router;
+
+```
