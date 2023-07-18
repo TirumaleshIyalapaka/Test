@@ -68,7 +68,6 @@ require("./src/routes/routes")(app, router);
 
 //     res.json({ message: "Data received successfully" });
 //   });
-
-app.listen(8080, () => {
+const port = app.listen(8080, () => {
   console.log("Server is running on 8080 port.");
 });

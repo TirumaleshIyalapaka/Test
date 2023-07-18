@@ -18,16 +18,22 @@ const controllers = require("../contollers/contollers");
 // router.get("/buycartitems", controllers.buycartitems);
 
 module.exports = function (app, router) {
+  //registeration api using contoller
   app.route("/signup").post(controllers.signup);
 
+  //login api
   app.route("/login").post(controllers.login);
 
+  //addproduct api to add the product
   app.route("/addproduct").post(controllers.addproduct);
 
+  //getprducts api
   app.route("/getproducts").get(controllers.getproducts);
 
+  //getcartdata api
   app.route("/getcartdata").get(controllers.getcartdata);
 
+  //buycartitems api
   app.route("/buycartitems").get(controllers.buycartitems);
 };
 

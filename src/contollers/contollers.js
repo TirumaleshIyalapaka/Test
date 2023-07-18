@@ -11,6 +11,13 @@ const db = mysql.createConnection({
   database: "shopping_cart",
 });
 
+/**
+ *
+ * @param {JSON} req this object contains the body sent from the request end to get the data of the registered user
+ * @param {JSON} res this object send back response after the user is registerd successfully into the database
+ * @returns {JSON} this object send back the respone adn deals with errors if returned any
+ */
+
 exports.signup = (req, res) => {
   console.log(req.body);
   const user = req.body;
@@ -25,6 +32,13 @@ exports.signup = (req, res) => {
   });
 };
 
+/**
+ * This function provides us with the login method
+ * @param {JSON} req this object contains the body sent from the request end and we are using that body to save data
+ * @param {JSON} res this object sends back the response if the user is a registered user or not.
+ *  If registerd it allows the user to go through go the shopping activity.
+ * @return {JSON}  res this object sends back the response and deals with errors if returned any
+ */
 exports.login = (req, res) => {
   console.log(req.body);
   const user = req.body;
@@ -41,6 +55,12 @@ exports.login = (req, res) => {
   });
 };
 
+/**
+ *This function deals with the registeration of products.
+ * @param {JSON} req this object contains the details of the user.
+ * @param {JSON} res this object contains the response of the products are inserted into the database.
+ * @returns {JSON} this object sends back the response of the registered products adn deals with the errors if any
+ */
 exports.addproduct = (req, res) => {
   console.log(req.body);
   const user = req.body;
@@ -55,7 +75,12 @@ exports.addproduct = (req, res) => {
   });
 };
 
-exports.getproducts = (req, res) => {
+/**
+ * This function gets the data of the products from the database.
+ * @param {JSON} res this object contains the response as the data of the products available in the database.
+ * @returns this object sends back the response of the available products and deals with errors if any.
+ */
+exports.getproducts = (res) => {
   util.usergetproducts((error, result) => {
     if (error) {
       console.error(error);
@@ -68,12 +93,19 @@ exports.getproducts = (req, res) => {
   });
 };
 
+/**
+ * This function adds a product to the user's cart when the user adds an items to the cart.
+ * @param {JSON} req this object gets the data of the user logged in and the product .
+ * @param {JSON} res this object sets the cart data of the user and updates the user cart data in the database.
+ * @returns this object sends back the response of the added cart items of the user and deals with the errors if any.
+ */
 exports.setcartdata = (req, res) => {
   console.log(req.body);
   const userid = req.body.userID;
   const prodid = req.body.prodid;
   // const quantity = req.body.qunatity;
   console.log(userid, prodid);
+  ``;
   let prodTotalQuantity = 0;
 
   db.query(
@@ -157,6 +189,12 @@ exports.setcartdata = (req, res) => {
   );
 };
 
+/**
+ * This function gets the cart data of the user currently logged in and the total price of the cart items.
+ * @param {JSON} req this object gets the data of the userID of the logged user.
+ * @param {JSON} res this object gets the data of the user cart items from the database along with the total cartvalue.
+ * @returns this object sends back the cartdata of the user logged and handles the errors that might occur.
+ */
 exports.getcartdata = async (req, res) => {
   const { userID } = req.query;
   console.log(req.query);
@@ -252,6 +290,12 @@ exports.getcartdata = async (req, res) => {
   // res.json({ message: "Data received successfully" });
 };
 
+/**
+ *This function is responsible for clearing of the cartitems of the user when the user purchases the items from cart and also updating the products table and the cart table in the database.
+ * @param {JSON} req this object contains the user data sent for the request end.
+ * @param {JSON} res this object contains the items the user purchases from the cart.
+ * @returns this object sends back the puchased items of the user from the cart and handles errors if any.
+ */
 exports.buycartitems = async (req, res) => {
   // const {userID} = req.query;
   // console.log(userID);
