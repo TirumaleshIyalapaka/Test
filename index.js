@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyparser = require("body-parser");
 const controllers = require("./src/contollers/contollers");
 const routes = require("./src/routes/routes");
+const router = require("./src/routes/routes");
 
 const app = express();
 
@@ -57,7 +58,9 @@ const db = mysql.createConnection({
 //     );
 //   }
 
-app.use("/", routes);
+// app.use("/", routes);
+
+require("./src/routes/routes")(app, router);
 
 // app.get("/getcartdata", (req, res) => {
 //     const { userID } = req.query;
