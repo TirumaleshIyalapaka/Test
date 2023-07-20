@@ -1,5 +1,8 @@
 const util = require("../util/util");
 const mysql = require("mysql");
+const nodeCache = require("node-cache");
+
+const Cache = new nodeCache();
 
 const cors = require("cors");
 const bodyparser = require("body-parser");
@@ -12,10 +15,9 @@ const db = mysql.createConnection({
 });
 
 /**
- *
+ *This function deals with the user registration
  * @param {JSON} req this object contains the body sent from the request end to get the data of the registered user
  * @param {JSON} res this object send back response after the user is registerd successfully into the database
- * @returns {JSON} this object send back the respone adn deals with errors if returned any
  */
 
 exports.signup = (req, res) => {
@@ -23,7 +25,7 @@ exports.signup = (req, res) => {
   const user = req.body;
   util.usersignup(user, (error, result) => {
     if (error) {
-      console.error(error);
+      console.log(error);
       res.status(500).json("An error Occured!");
     } else {
       console.log(result);
@@ -33,7 +35,9 @@ exports.signup = (req, res) => {
 };
 
 /**
- * This function provides us with the login method
+ * @property {function login(req,res)}
+  
+ }on}This function provides us with the login method
  * @param {JSON} req this object contains the body sent from the request end and we are using that body to save data
  * @param {JSON} res this object sends back the response if the user is a registered user or not.
  *  If registerd it allows the user to go through go the shopping activity.
@@ -75,22 +79,33 @@ exports.addproduct = (req, res) => {
   });
 };
 
+//Modified the following code with cache
 /**
  * This function gets the data of the products from the database.
  * @param {JSON} res this object contains the response as the data of the products available in the database.
  * @returns this object sends back the response of the available products and deals with errors if any.
  */
-exports.getproducts = (res) => {
-  util.usergetproducts((error, result) => {
-    if (error) {
-      console.error(error);
-      res.status(500).send({ err: error });
-    }
-    if (result.length > 0) {
-      console.log(result);
-      res.status(200).send(result);
-    }
-  });
+exports.getproducts = (req, res) => {
+  const cacheKey = "getProducts";
+  const cacheData = Cache.get(cacheKey);
+
+  if (cacheData) {
+    console.log("Data got from cache");
+    res.status(200).send(cacheData);
+  } else {
+    util.usergetproducts((error, result) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send({ err: error });
+      }
+      if (result.length > 0) {
+        console.log(result);
+        console.log("Received data from the database");
+        Cache.set(cacheKey, result, 60);
+        res.status(200).send(result);
+      }
+    });
+  }
 };
 
 /**
@@ -196,6 +211,10 @@ exports.setcartdata = (req, res) => {
  * @returns this object sends back the cartdata of the user logged and handles the errors that might occur.
  */
 exports.getcartdata = async (req, res) => {
+  const cacheKey = "getcartdata";
+  const cachevalueKey = "getcartvalue";
+  const cacheData = Cache.get("getcartdata");
+  const cachecartValue = Cache.get("getcartvalue");
   const { userID } = req.query;
   console.log(req.query);
   console.log(userID, " is my user id");
@@ -203,66 +222,74 @@ exports.getcartdata = async (req, res) => {
   let cartData;
   let products;
   let cartValue = 0;
-  try {
-    await new Promise((resolve, reject) => {
-      db.query(
-        "SELECT * FROM cart WHERE userID = ?",
-        [userID],
-        async (err, result) => {
+  if (cacheData) {
+    console.log("Getting data from cache");
+    res.status(200).send([cacheData, cachecartValue]);
+  } else {
+    try {
+      await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT * FROM cart WHERE userID = ?",
+          [userID],
+          async (err, result) => {
+            if (err) {
+              console.log(err);
+              return reject(err);
+            }
+            if (result.length > 0) {
+              cartData = result;
+            }
+            resolve();
+          }
+        );
+      });
+
+      console.log(
+        cartData,
+        " is my cart data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+      );
+
+      await new Promise((resolve, reject) => {
+        db.query("SELECt * FROM products", (err, result) => {
           if (err) {
             console.log(err);
             return reject(err);
           }
-          if (result.length > 0) {
-            cartData = result;
+          if (result.length !== 0) {
+            products = result;
           }
           resolve();
-        }
-      );
-    });
-
-    console.log(
-      cartData,
-      " is my cart data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-    );
-
-    await new Promise((resolve, reject) => {
-      db.query("SELECt * FROM products", (err, result) => {
-        if (err) {
-          console.log(err);
-          return reject(err);
-        }
-        if (result.length !== 0) {
-          products = result;
-        }
-        resolve();
+        });
       });
-    });
 
-    console.log(products, " is all the products data");
+      console.log(products, " is all the products data");
 
-    // Process the cartData and products as needed
+      // Process the cartData and products as needed
 
-    // Return the response
-    const purchasedItems = cartData.map((item) => {
-      console.log(item, "is cart item");
-      const matchedProduct = products.find(
-        (product) => item.prodid === product.prodid
-      );
-      if (matchedProduct) {
-        cartValue += matchedProduct.price * item.quantity;
-        return { ...matchedProduct, cartItemQty: item.quantity };
-      }
-      // return null; // Return null if no match is found
-    });
-    console.log(cartValue);
+      // Return the response
 
-    console.log(purchasedItems, "are the items purchased");
+      const purchasedItems = cartData.map((item) => {
+        console.log(item, "is cart item");
+        const matchedProduct = products.find(
+          (product) => item.prodid === product.prodid
+        );
+        if (matchedProduct) {
+          cartValue += matchedProduct.price * item.quantity;
+          return { ...matchedProduct, cartItemQty: item.quantity };
+        }
+        // return null; // Return null if no match is found
+      });
+      console.log(cartValue);
 
-    res.send([purchasedItems, cartValue]);
-    //   res.status(200).json({ cartData, products });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      console.log(purchasedItems, "are the items purchased");
+      Cache.set("getcartdata", purchasedItems, 30);
+      Cache.set("getcartvalue", cartValue, 30);
+      console.log("Getting data from the database");
+      res.send([purchasedItems, cartValue]);
+      //   res.status(200).json({ cartData, products });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 
   // const purchasedItems = carData && carData.map((item)=>{
