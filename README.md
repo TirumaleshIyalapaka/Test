@@ -1,9 +1,7 @@
 # Backend Code for Shopping_Cart
 I have tried to organize the code using the MVC architecture.
 
-<a name="overview"></a>
-## Overview 
-Hello This is overview from above.
+[Jump to Overview](#overview)
 
 ## The following are a few aspets of the code. 
 I have written the controllers inside the controllers.js file.  
@@ -48,4 +46,8 @@ module.exports = function (app, router) {
 
 ```
 
-[Jump to Overview](#overview)
+
+
+<a name="overview"></a>
+## Overview 
+Hello This is overview from above.
