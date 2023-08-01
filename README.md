@@ -2,9 +2,9 @@
 I have tried to organize the code using the MVC architecture.
 
 
-<!--[Jump to Overview](#overview)-->
+<!-- [Jump to Overview](#overview)-->
 
-<!--[jump to last](#last) -->
+<!-- [jump to last](#last)-->
 
 ## The following are a few aspets of the code. 
 I have written the controllers inside the controllers.js file.  
